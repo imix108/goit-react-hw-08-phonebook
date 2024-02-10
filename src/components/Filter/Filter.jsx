@@ -1,25 +1,24 @@
-import css from './Filter.module.css';
-import { useDispatch, useSelector } from 'react-redux';
-import { filterContact } from '../../redux/sliceFilter';
+import { OutlinedInput } from '@mui/material';
+import { useDispatch } from 'react-redux';
+import { setQueryFilter } from '../../redux/filter/slice';
 
-export const Filter = () => {
-  const filter = useSelector(state => state.filter);
+function Filter() {
   const dispatch = useDispatch();
 
- 
+  const handleInputChange = event => {
+    const newValue = event.target.value;
+    dispatch(setQueryFilter(newValue));
+  };
+
   return (
-    <>
-      <label className={css.filterLabel} htmlFor="">
-        <span>Find contacts by name</span>
-      </label>
-      <input
-        className={css.filterInput}
-        value={filter}
-        onChange={e => dispatch(filterContact(e.currentTarget.value))}
-        type="text"
-        name="filter"
-        placeholder="Taras Kalina"
-      />
-    </>
+    <OutlinedInput
+      fullWidth
+      type="text"
+      name="filter"
+      placeholder="Search by name"
+      onChange={handleInputChange}
+    />
   );
-};
+}
+
+export default Filter;

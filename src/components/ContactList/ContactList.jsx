@@ -1,36 +1,68 @@
-import PropTypes from 'prop-types';
-import css from './ContactList.module.css';
+import React, { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { delContactsThunk } from '../../redux/ContactsThunk';
+import { Divider, Grid, List, ListItem, useMediaQuery } from '@mui/material';
+import AtomicSpinner from 'atomic-spinner';
+import { getContacts } from '../../redux/contacts/selectors';
+import { getFilter } from '../../redux/filter/selectors';
+import { useAuth } from '../../hooks/useAuth';
+import ContactsItem from 'components/ContactItem/ContactItem';
+import { fetchContacts } from '../../redux/contacts/operations';
 
-export const ContactList = () => {
+const ContactList = () => {
+  // Create a Redux dispatcher
   const dispatch = useDispatch();
-  const contacts = useSelector(state => state.contacts.items);
-  const filtered = useSelector(state => state.filter);
+  // Use auth selectors
+  const { isLoggedIn } = useAuth();
 
-  const filteredContacts = contacts.filter(contact =>
-    contact.name.toLowerCase().includes(filtered.toLowerCase())
+  useEffect(() => {
+    if (isLoggedIn) {
+      dispatch(fetchContacts());
+    }
+  }, [dispatch, isLoggedIn]);
+
+  const { items, isLoading, error } = useSelector(getContacts);
+  const filter = useSelector(getFilter);
+
+  const filteredContacts = filter
+    ? items.filter(contact =>
+        contact.name.toLowerCase().includes(filter.toLowerCase())
+      )
+    : items;
+
+  const isPhoneDisplay = useMediaQuery('(max-width:426px)');
+
+  return (
+    <>
+      {isLoading && (
+        <Grid container justifyContent="center" alignItems="center">
+          <Grid item>
+            <AtomicSpinner />
+          </Grid>
+        </Grid>
+      )}
+      {items && !isLoading && (
+        <List>
+          {filteredContacts.map((contact, index) => (
+            <React.Fragment key={contact.id}>
+              <ListItem
+                sx={{
+                  display: 'flex',
+                  columnGap: 20,
+                  rowGap: isPhoneDisplay ? 2 : 0,
+                  justifyContent: isPhoneDisplay ? 'center' : 'space-between',
+                  flexWrap: 'wrap',
+                }}
+              >
+                <ContactsItem contact={contact} />
+              </ListItem>
+              {index !== filteredContacts.length - 1 && <Divider />}
+            </React.Fragment>
+          ))}
+        </List>
+      )}
+      {error && <b>{error}</b>}
+    </>
   );
-
-  return filteredContacts.map(cont => (
-    <p key={cont.id} className={css.contactItem}>
-      <span className={css.contactText}>
-        {cont.name}: {cont.phone}
-      </span>
-      <button
-        className={css.deleteBtn}
-        type="button"
-        onClick={() => {
-          dispatch(delContactsThunk(cont.id));
-        }}
-      >
-        Delete
-      </button>
-    </p>
-  ));
 };
 
-ContactList.propTypes = {
-  contacts: PropTypes.array.isRequired,
-  filtered: PropTypes.string.isRequired,
-};
+export default ContactList;
