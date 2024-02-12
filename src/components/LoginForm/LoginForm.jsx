@@ -17,7 +17,7 @@ import { Link } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
 import { logIn } from '../../redux/auth/operations';
 import createToast from 'utils/toast';
-import Copyright from 'components/Copyright/Copyright';
+
 
 // Validation for login form
 const validationSchema = yup.object({
@@ -125,7 +125,6 @@ const LoginForm = () => {
           </Button>
         </Box>
       </Box>
-      <Copyright sx={{ mt: 5 }} />
     </Container>
   );
 };

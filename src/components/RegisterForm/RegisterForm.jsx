@@ -17,7 +17,6 @@ import { Link } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
 import { register } from '../../redux/auth/operations';
 import createToast from 'utils/toast';
-import Copyright from 'components/Copyright/Copyright';
 
 // Validation for registration form
 const validationSchema = yup.object({
@@ -154,7 +153,6 @@ const RegisterForm = () => {
           I already have a profile
         </Button>
       </Box>
-      <Copyright sx={{ mt: 5 }} />
     </Container>
   );
 };
