@@ -3,8 +3,9 @@ import { useFormik } from 'formik';
 import { useDispatch } from 'react-redux';
 import { TextField, Box, Button } from '@mui/material';
 import { addContact } from '../../redux/contacts/operations';
+import { useSelector } from 'react-redux';
+import { getContacts } from '../../redux/contacts/selectors';
 
-// Validation for registration form
 const validationSchema = yup.object({
   name: yup
     .string('Enter contact name')
@@ -25,20 +26,27 @@ const validationSchema = yup.object({
 });
 
 const ContactForm = () => {
-  // Create a Redux dispatcher
   const dispatch = useDispatch();
-  // Initialization Formik
+  const contacts = useSelector(state => getContacts(state).items);
   const formik = useFormik({
     initialValues: {
       name: '',
       number: '',
     },
     validationSchema: validationSchema,
-    onSubmit: values => {
+    onSubmit: values => handleSubmit(values),
+  });
+
+  const handleSubmit = values => {
+    const isNameUnique = !contacts.some(contact => contact.name === values.name);
+
+    if (isNameUnique) {
       dispatch(addContact(values));
       formik.resetForm();
-    },
-  });
+    } else {
+      formik.setFieldError('name', 'This contact name already exists');
+    }
+  };
 
   return (
     <Box component="form" onSubmit={formik.handleSubmit}>

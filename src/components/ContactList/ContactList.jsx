@@ -30,7 +30,6 @@ const ContactList = () => {
     : items;
 
   const isPhoneDisplay = useMediaQuery('(max-width:426px)');
-
   return (
     <>
       {isLoading && (
