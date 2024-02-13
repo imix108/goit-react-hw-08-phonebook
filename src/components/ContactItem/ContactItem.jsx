@@ -11,22 +11,32 @@ import {
 } from '@mui/material';
 import DeleteIcon from '@mui/icons-material/Delete';
 import EditIcon from '@mui/icons-material/Edit';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { editContact, deleteContact } from '../../redux/contacts/operations';
 import stringAvatar from 'utils/avatarCreator';
+import { getContacts } from '../../redux/contacts/selectors';
 
 function ContactsItem({ contact: { name, number, id } }) {
   const dispatch = useDispatch();
+  const contacts = useSelector(state => getContacts(state).items);
   const [isEditing, setIsEditing] = useState(false);
   const [editedName, setEditedName] = useState(name);
   const [editedNumber, setEditedNumber] = useState(number);
 
   const handleEdit = () => {
+    const isNameUnique = contacts.every(contact => contact.id === id || contact.name !== editedName);
+
+    if (!isNameUnique) {
+      alert('This contact name already exists.');
+      return;
+    }
+
     dispatch(editContact({ id: id, name: editedName, number: editedNumber }));
     setIsEditing(false);
   };
 
   const handleDelete = () => dispatch(deleteContact(id));
+
   return (
     <>
       {isEditing ? (
