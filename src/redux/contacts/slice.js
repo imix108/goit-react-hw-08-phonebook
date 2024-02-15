@@ -21,12 +21,12 @@ const handleRejected = (state, { payload }) => {
   state.error = payload;
 };
 
-const handleFulfieldGetAllContacts = (state, { payload }) => {
+const handleFulfilledGetAllContacts = (state, { payload }) => {
   state.isLoading = false;
   state.items = payload;
 };
 
-const handleFulfieldAddContact = (state, { payload }) => {
+const handleFulfilledAddContact = (state, { payload }) => {
   state.isLoading = false;
   state.items.push(payload);
 };
@@ -44,21 +44,26 @@ const handleFulfilledEditContact = (state, { payload }) => {
   state.isLoading = false;
 };
 
-const handleFulfieldDeleteContact = (state, { payload }) => {
-  const index = state.items.findIndex(contact => contact.id === payload);
-  state.isLoading = false;
-  state.items.splice(index, 1);
+const handleFulfilledDeleteContact = (state, { payload }) => {
+  const contactId = payload.id; 
+  const index = state.items.findIndex(contact => contact.id === contactId);
+  if (index !== -1) {
+    state.isLoading = false;
+    state.items.splice(index, 1);
+  }
 };
+
+
 
 const contactsSlice = createSlice({
   name: 'contacts',
   initialState: contactInitialState,
   extraReducers: builder => {
     builder
-      .addCase(fetchContacts.fulfilled, handleFulfieldGetAllContacts)
-      .addCase(addContact.fulfilled, handleFulfieldAddContact)
+      .addCase(fetchContacts.fulfilled, handleFulfilledGetAllContacts)
+      .addCase(addContact.fulfilled, handleFulfilledAddContact)
       .addCase(editContact.fulfilled, handleFulfilledEditContact)
-      .addCase(deleteContact.fulfilled, handleFulfieldDeleteContact)
+      .addCase(deleteContact.fulfilled, handleFulfilledDeleteContact)
       .addMatcher(
         action => action.type.endsWith('/pending'),
         state => {
